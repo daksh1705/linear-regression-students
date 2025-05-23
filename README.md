@@ -1,36 +1,38 @@
-# Multiple Linear Regression on StudentsPerformance Dataset
+import pandas as pd
+from sklearn.linear_model import LinearRegression
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import r2_score
+import matplotlib.pyplot as plt
 
-This project demonstrates a simple **Multiple Linear Regression** model to predict students' **Math scores** based on their **Reading** and **Writing scores** using the `StudentsPerformance.csv` dataset.
+# Load dataset
+df = pd.read_csv('/kaggle/input/student/StudentsPerformance.csv')
 
----
+# Select features and target
+X = df[['reading score', 'writing score']]
+y = df['math score']
 
-## Dataset
+# Split the data
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-The dataset contains students' scores in three subjects:
-- Math Score (Target)
-- Reading Score (Feature)
-- Writing Score (Feature)
+# Train the model
+model = LinearRegression()
+model.fit(X_train, y_train)
 
-You can find the dataset [here](https://www.kaggle.com/datasets/spscientist/students-performance-in-exams).
+# Predict and evaluate
+y_pred = model.predict(X_test)
+accuracy = r2_score(y_test, y_pred)
+print(f"R² accuracy on test set: {accuracy:.4f}")
 
----
+# Predict a single input example
+single_input = [[80, 75]]
+predicted_math_score = model.predict(single_input)
+print(f"Predicted math score for reading=80 and writing=75: {predicted_math_score[0]:.2f}")
 
-## Project Overview
-
-- Load the dataset using `pandas`.
-- Use **Reading** and **Writing scores** as input features to predict the **Math score**.
-- Split the dataset into training and testing sets (80% training, 20% testing).
-- Train a Multiple Linear Regression model using `scikit-learn`.
-- Evaluate the model using the R² (coefficient of determination) score.
-- Visualize the actual vs predicted math scores using a scatter plot.
-- Predict math score for a single input example.
-
----
-
-## How to Run
-
-1. Clone the repo or download the notebook/script.
-2. Ensure you have the required libraries installed:
-
-```bash
-pip install pandas scikit-learn matplotlib
+# Visualization
+plt.scatter(y_test, y_pred, color='blue', alpha=0.6)
+plt.plot([y.min(), y.max()], [y.min(), y.max()], 'r--')
+plt.xlabel('Actual Math Scores')
+plt.ylabel('Predicted Math Scores')
+plt.title('Actual vs Predicted Math Scores')
+plt.grid(True)
+plt.show()
